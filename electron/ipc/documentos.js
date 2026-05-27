@@ -1,6 +1,7 @@
 const { ipcMain, app, shell } = require('electron')
 const path = require('path')
 const fs = require('fs')
+const { execFile } = require('child_process')
 const PizZip = require('pizzip')
 const Docxtemplater = require('docxtemplater')
 const { getDb } = require('./db')
@@ -85,8 +86,29 @@ ipcMain.handle('rh:abrir-documento', (_, caminho) => {
 
 ipcMain.handle('rh:imprimir-documento', (_, caminho) => {
   if (!fs.existsSync(caminho)) throw new Error('Arquivo não encontrado: ' + caminho)
-  shell.openPath(caminho)
-  return { ok: true }
+
+  // Invoca o verbo "Print" do shell do Windows via PowerShell.
+  // Start-Process -Verb Print abre o Word minimizado, envia para a
+  // impressora padrão e fecha automaticamente — sem abrir a janela do Word.
+  const caminhoPS = caminho.replace(/'/g, "''") // escapa aspas simples no PS
+
+  return new Promise((resolve, reject) => {
+    execFile(
+      'powershell.exe',
+      [
+        '-NoProfile',
+        '-NonInteractive',
+        '-WindowStyle', 'Hidden',
+        '-Command',
+        `Start-Process -FilePath '${caminhoPS}' -Verb Print`,
+      ],
+      { windowsHide: true },
+      (error) => {
+        if (error) reject(new Error('Falha ao enviar para impressão: ' + error.message))
+        else resolve({ ok: true })
+      }
+    )
+  })
 })
 
 ipcMain.handle('rh:listar-historico', () => {
