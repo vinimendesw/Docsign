@@ -1,0 +1,30 @@
+const { contextBridge, ipcRenderer } = require('electron')
+
+contextBridge.exposeInMainWorld('rh', {
+  // Templates / Requerimentos
+  listarRequerimentos: () => ipcRenderer.invoke('rh:listar-requerimentos'),
+  importarTemplate: () => ipcRenderer.invoke('rh:importar-template'),
+  salvarRequerimento: (dados) => ipcRenderer.invoke('rh:salvar-requerimento', dados),
+  excluirRequerimento: (id) => ipcRenderer.invoke('rh:excluir-requerimento', id),
+  toggleRequerimento: (id, ativo) => ipcRenderer.invoke('rh:toggle-requerimento', id, ativo),
+
+  // Geração de documentos
+  gerarDocumento: (requerimentoId, dados) => ipcRenderer.invoke('rh:gerar-documento', requerimentoId, dados),
+  abrirDocumento: (caminho) => ipcRenderer.invoke('rh:abrir-documento', caminho),
+  imprimirDocumento: (caminho) => ipcRenderer.invoke('rh:imprimir-documento', caminho),
+
+  // Histórico
+  listarHistorico: () => ipcRenderer.invoke('rh:listar-historico'),
+  listarDocumentosGerados: (requerimentoId) => ipcRenderer.invoke('rh:listar-documentos-gerados', requerimentoId),
+
+  // Geração em massa
+  modeloJsonEmMassa: (requerimentoId) => ipcRenderer.invoke('rh:modelo-json-em-massa', requerimentoId),
+  importarJson: () => ipcRenderer.invoke('rh:importar-json'),
+  gerarDocumentosEmMassa: (requerimentoId, registros) => ipcRenderer.invoke('rh:gerar-documentos-em-massa', requerimentoId, registros),
+
+  // Configurações
+  lerConfiguracoes: () => ipcRenderer.invoke('rh:ler-configuracoes'),
+  escolherPastaGerados: () => ipcRenderer.invoke('rh:escolher-pasta-gerados'),
+  resetarPastaGerados: () => ipcRenderer.invoke('rh:resetar-pasta-gerados'),
+  abrirPastaGerados: () => ipcRenderer.invoke('rh:abrir-pasta-gerados'),
+})

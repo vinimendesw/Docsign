@@ -1,0 +1,89 @@
+const { app, BrowserWindow, dialog } = require('electron')
+const path = require('path')
+const fs = require('fs')
+const { pathToFileURL } = require('url')
+
+const isDev = !app.isPackaged
+
+let mainWindow
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    minWidth: 900,
+    minHeight: 600,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+    titleBarStyle: 'default',
+    title: 'Sistema de Requerimentos RH',
+  })
+
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:5173')
+    mainWindow.webContents.openDevTools()
+  } else {
+    // pathToFileURL lida corretamente com barras e espaços no Windows
+    const indexPath = path.join(__dirname, '../dist/index.html')
+    mainWindow.loadURL(pathToFileURL(indexPath).href)
+  }
+
+  // Exibe erro se o HTML não carregar (caminho errado, arquivo ausente etc.)
+  mainWindow.webContents.on('did-fail-load', (_, errorCode, errorDesc) => {
+    console.error('did-fail-load:', errorCode, errorDesc)
+    mainWindow.webContents.executeJavaScript(`
+      document.body.innerHTML =
+        '<div style="font-family:sans-serif;padding:40px;color:#c00">' +
+        '<h2>Falha ao carregar a interface</h2>' +
+        '<p>Código: ${errorCode} — ${errorDesc}</p>' +
+        '</div>'
+    `).catch(() => {})
+  })
+}
+
+function ensureDirectories() {
+  const userData = app.getPath('userData')
+  const dirs = [
+    path.join(userData, 'templates'),
+    path.join(userData, 'gerados'),
+  ]
+  dirs.forEach(dir => {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+  })
+}
+
+app.whenReady().then(async () => {
+  ensureDirectories()
+
+  try {
+    const { initDb } = require('./ipc/db')
+    await initDb()
+    require('./ipc/templates')
+    require('./ipc/documentos')
+    require('./ipc/configuracoes')
+  } catch (err) {
+    console.error('Erro na inicialização:', err)
+    // Abre a janela mesmo assim; o erro aparecerá via dialog após a janela abrir
+    app.once('browser-window-created', () => {
+      dialog.showErrorBox(
+        'Erro ao inicializar o sistema',
+        `Não foi possível carregar o banco de dados.\n\n${err?.message ?? err}\n\n` +
+        'Verifique se o aplicativo foi instalado corretamente e tente novamente.'
+      )
+    })
+  }
+
+  // createWindow é chamado SEMPRE — nunca deixa a tela em branco sem motivo
+  createWindow()
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit()
+})
