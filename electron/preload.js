@@ -27,4 +27,10 @@ contextBridge.exposeInMainWorld('rh', {
   escolherPastaGerados: () => ipcRenderer.invoke('rh:escolher-pasta-gerados'),
   resetarPastaGerados: () => ipcRenderer.invoke('rh:resetar-pasta-gerados'),
   abrirPastaGerados: () => ipcRenderer.invoke('rh:abrir-pasta-gerados'),
+
+  // Atualizações automáticas
+  onUpdateAvailable:  (cb) => ipcRenderer.on('update:available',  (_, info) => cb(info)),
+  onUpdateProgress:   (cb) => ipcRenderer.on('update:progress',   (_, prog) => cb(prog)),
+  onUpdateDownloaded: (cb) => ipcRenderer.on('update:downloaded', (_, info) => cb(info)),
+  installUpdate: () => ipcRenderer.invoke('update:install'),
 })

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const { pathToFileURL } = require('url')
@@ -79,6 +79,9 @@ app.whenReady().then(async () => {
   // createWindow é chamado SEMPRE — nunca deixa a tela em branco sem motivo
   createWindow()
 
+  // Configura auto-update (apenas em produção)
+  setupAutoUpdater()
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
@@ -87,3 +90,53 @@ app.whenReady().then(async () => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
+
+// ── AUTO-UPDATE ──────────────────────────────────────────────────────────────
+function setupAutoUpdater() {
+  // Só funciona em produção (app empacotado)
+  if (isDev) return
+
+  const { autoUpdater } = require('electron-updater')
+
+  autoUpdater.autoDownload = true        // baixa em segundo plano automaticamente
+  autoUpdater.autoInstallOnAppQuit = true // instala ao fechar se já baixou
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('Atualização disponível:', info.version)
+    mainWindow?.webContents.send('update:available', {
+      version: info.version,
+      releaseNotes: info.releaseNotes ?? '',
+    })
+  })
+
+  autoUpdater.on('download-progress', (progress) => {
+    mainWindow?.webContents.send('update:progress', {
+      percent: Math.round(progress.percent),
+      transferred: progress.transferred,
+      total: progress.total,
+    })
+  })
+
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('Download concluído:', info.version)
+    mainWindow?.webContents.send('update:downloaded', {
+      version: info.version,
+    })
+  })
+
+  autoUpdater.on('error', (err) => {
+    console.error('Erro no auto-updater:', err?.message ?? err)
+  })
+
+  // Verifica após 4 s para não bloquear a inicialização
+  setTimeout(() => {
+    autoUpdater.checkForUpdates().catch(err => {
+      console.error('Falha ao verificar atualizações:', err?.message ?? err)
+    })
+  }, 4000)
+
+  // IPC: renderer pede para instalar agora
+  ipcMain.handle('update:install', () => {
+    autoUpdater.quitAndInstall(false, true)
+  })
+}

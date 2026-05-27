@@ -353,3 +353,56 @@ html, body, #root {
 .alert { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 16px; }
 .alert-danger { background: var(--danger-bg); border: 1px solid #F5C6C6; color: var(--danger); }
 .alert-success { background: var(--success-bg); border: 1px solid #B7DFC8; color: var(--success); }
+
+/* ── UPDATE BANNER ── */
+.update-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  font-size: 12.5px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  animation: fadeUp .3s ease both;
+}
+.update-banner--downloading {
+  background: #FFFBEB;
+  color: #7C5A00;
+  border-color: #F3D87B;
+}
+.update-banner--ready {
+  background: var(--success-bg);
+  color: var(--success);
+  border-color: #B7DFC8;
+}
+.update-banner svg { flex-shrink: 0; opacity: .75; }
+.update-banner span { flex: 1; }
+.update-progress-bar {
+  width: 120px;
+  height: 4px;
+  background: rgba(0,0,0,.1);
+  border-radius: 99px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.update-progress-fill {
+  height: 100%;
+  background: #D4A017;
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+.update-banner--ready .update-progress-fill { background: var(--success); }
+.update-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.update-btn {
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity .15s;
+}
+.update-btn:hover { opacity: .85; }
+.update-btn--primary { background: var(--success); color: #fff; }
+.update-btn--ghost { background: transparent; color: var(--success); border: 1px solid var(--success); }

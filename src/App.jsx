@@ -12,6 +12,9 @@ export default function App() {
   const [requerimentoSelecionado, setRequerimentoSelecionado] = useState(null)
   const [toast, setToast] = useState(null)
   const [totalAtivos, setTotalAtivos] = useState(0)
+  const [updateAvailable, setUpdateAvailable] = useState(null)   // { version }
+  const [updateReady, setUpdateReady] = useState(null)           // { version }
+  const [updateProgress, setUpdateProgress] = useState(null)     // 0-100 ou null
 
   useEffect(() => {
     if (window.rh) {
@@ -20,6 +23,22 @@ export default function App() {
       }).catch(() => {})
     }
   }, [pagina])
+
+  // Escuta eventos do auto-updater (só chegam em produção)
+  useEffect(() => {
+    if (!window.rh) return
+    window.rh.onUpdateAvailable?.((info) => {
+      setUpdateAvailable(info)
+      setUpdateProgress(0)
+    })
+    window.rh.onUpdateProgress?.((prog) => {
+      setUpdateProgress(prog.percent)
+    })
+    window.rh.onUpdateDownloaded?.((info) => {
+      setUpdateReady(info)
+      setUpdateProgress(null)
+    })
+  }, [])
 
   function mostrarToast(titulo, sub) {
     setToast({ titulo, sub })
@@ -134,6 +153,49 @@ export default function App() {
 
       {/* ── MAIN ── */}
       <main className="main">
+
+        {/* ── Banner: download em andamento ── */}
+        {updateAvailable && !updateReady && (
+          <div className="update-banner update-banner--downloading">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+              <polyline points="8 17 12 21 16 17"/><line x1="12" y1="3" x2="12" y2="21"/>
+            </svg>
+            <span>
+              Nova versão <strong>v{updateAvailable.version}</strong> disponível
+              {updateProgress !== null && updateProgress > 0
+                ? ` — baixando… ${updateProgress}%`
+                : ' — baixando em segundo plano…'
+              }
+            </span>
+            {updateProgress !== null && (
+              <div className="update-progress-bar">
+                <div className="update-progress-fill" style={{ width: `${updateProgress}%` }} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Banner: pronto para instalar ── */}
+        {updateReady && (
+          <div className="update-banner update-banner--ready">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <span>
+              Versão <strong>v{updateReady.version}</strong> baixada e pronta para instalar.
+            </span>
+            <div className="update-actions">
+              <button className="update-btn update-btn--primary" onClick={() => window.rh.installUpdate()}>
+                Instalar agora
+              </button>
+              <button className="update-btn update-btn--ghost" onClick={() => setUpdateReady(null)}>
+                Mais tarde
+              </button>
+            </div>
+          </div>
+        )}
+
         {pagina === 'painel' && (
           <Painel onPreencher={abrirFormulario} onGerenciar={() => irPara('gerenciador')} />
         )}
