@@ -56,6 +56,13 @@ export default function Formulario({ requerimento, onCancelar, onToast }) {
     await window.rh.imprimirDocumento(resultado)
   }
 
+  function handleNovo() {
+    setResultado(null)
+    setValores(valoresIniciais)
+    setErros({})
+    setErroGeral(null)
+  }
+
   if (resultado) {
     return (
       <>
@@ -92,6 +99,13 @@ export default function Formulario({ requerimento, onCancelar, onToast }) {
                   <rect x="6" y="14" width="12" height="8"/>
                 </svg>
                 Imprimir
+              </button>
+              <button className="btn btn-ghost" onClick={handleNovo}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="1 4 1 10 7 10"/>
+                  <path d="M3.51 15a9 9 0 1 0 .49-4"/>
+                </svg>
+                Preencher novamente
               </button>
               <button className="btn btn-ghost" onClick={onCancelar}>
                 ← Voltar ao painel

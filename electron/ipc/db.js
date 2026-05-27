@@ -226,7 +226,10 @@ function seedInicial() {
     const origem  = path.join(seedsDir, seed.arquivo)
     const destino = path.join(templatesDir, seed.arquivo)
 
-    if (fs.existsSync(origem) && !fs.existsSync(destino)) {
+    // Sempre sincroniza o template do seed → userData/templates.
+    // Isso garante que novas versões do .docx (com novos placeholders)
+    // sejam aplicadas mesmo que o arquivo já exista na máquina do usuário.
+    if (fs.existsSync(origem)) {
       fs.copyFileSync(origem, destino)
     }
 
