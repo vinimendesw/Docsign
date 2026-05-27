@@ -194,6 +194,20 @@ const SEEDS = [
   ],
 },
 
+  {
+  id: 'Abertura de conta',            
+  nome: 'Abertura de Conta',
+  categoria: 'Requerimento',
+  arquivo: 'abertura_conta.docx',
+  campos: [
+    { id: 'NOME', label: 'Nome completo',    tipo: 'text',      obrigatorio: true  },
+    { id: 'CPF', label: 'CPF',    tipo: 'cpf',      obrigatorio: true  },
+    { id: 'DATA_NOMEACAO',    label: 'Data de Nomeação', tipo: 'date',      obrigatorio: true  },
+    { id: 'N_CARGO',            label: 'Cargo',            tipo: 'text',      obrigatorio: true  },
+    { id: 'SALARIO',    label: 'Salário Base', tipo: 'text',      obrigatorio: true  },
+    { id: 'DATA_HOJE',     label: 'Data atual',  tipo: 'data_hoje', obrigatorio: true  }
+  ],
+}
 
 ]
 
