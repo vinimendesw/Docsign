@@ -186,6 +186,7 @@ const SEEDS = [
     { id: 'N_CARGO',            label: 'Cargo',            tipo: 'text',      obrigatorio: true  },
     { id: 'DATA_NOMEACAO',    label: 'Data de Nomeação', tipo: 'date',      obrigatorio: true  },
     { id: 'NIVEL',    label: 'Nível Atual', tipo: 'text',      obrigatorio: true  },
+    { id: 'LETRA',    label: 'Letra', tipo: 'text',      obrigatorio: true  },
     { id: 'SUBNIVEL',    label: 'Subnível Atual', tipo: 'text',      obrigatorio: true  },
     { id: 'ANUENIO',    label: 'Quantidade de Anuênios', tipo: 'text',      obrigatorio: true  },
     { id: 'DATA_HOJE',     label: 'Data atual',  tipo: 'data_hoje', obrigatorio: true  }
