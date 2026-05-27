@@ -1,6 +1,6 @@
 {
   "name": "sistema-rh",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Sistema de Requerimentos de RH",
   "author": "Departamento RH",
   "main": "electron/main.js",
