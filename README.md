@@ -1,2 +1,1 @@
-# Docsign
-Desktop app for generating documents from Word templates — single or bulk, powered by Electron + React.
+RHdoc is a desktop application built with Electron and React that automates HR document generation. Import .docx templates with {{field}} placeholders, fill them through a guided form or feed a JSON file for bulk generation, and get print-ready documents in seconds. Built for HR departments that deal with high volumes of recurring paperwork.
