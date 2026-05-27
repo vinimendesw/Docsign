@@ -205,6 +205,7 @@ const SEEDS = [
     { id: 'DATA_NOMEACAO',    label: 'Data de Nomeação', tipo: 'date',      obrigatorio: true  },
     { id: 'N_CARGO',            label: 'Cargo',            tipo: 'text',      obrigatorio: true  },
     { id: 'SALARIO',    label: 'Salário Base', tipo: 'text',      obrigatorio: true  },
+    { id: 'N_ASSINATURA', label: 'Nome da Assinatura',    tipo: 'select', obrigatorio: true, opcoes: ['VINICIUS ALEXANDRE RODRIGUES MENDES', 'CARLOS ALEXANDRE DA COSTA FIAIA', 'MARLENE ABADIA OLIVEIRA']},
     { id: 'DATA_HOJE',     label: 'Data atual',  tipo: 'data_hoje', obrigatorio: true  }
   ],
 }
