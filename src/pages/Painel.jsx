@@ -33,7 +33,7 @@ export default function Painel({ onPreencher, onGerenciar }) {
     <>
       <div className="topbar">
         <div className="topbar-left">
-          <div className="page-title">Painel de Requerimentos</div>
+          <div className="page-title">Painel de Documentos</div>
           <div className="breadcrumb">Início <span>›</span> Painel</div>
         </div>
         <div className="topbar-actions">
@@ -51,7 +51,7 @@ export default function Painel({ onPreencher, onGerenciar }) {
           <div className="stat-card">
             <div>
               <div className="stat-value">{requerimentos.length}</div>
-              <div className="stat-label">Requerimentos ativos</div>
+              <div className="stat-label">Templates ativos</div>
             </div>
             <div className="stat-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -86,7 +86,7 @@ export default function Painel({ onPreencher, onGerenciar }) {
 
         <div className="section-header">
           <div className="section-title">Documentos disponíveis</div>
-          <div className="section-meta">{requerimentos.length} requerimento{requerimentos.length !== 1 ? 's' : ''}</div>
+          <div className="section-meta">{requerimentos.length} template{requerimentos.length !== 1 ? 's' : ''}</div>
         </div>
 
         <div className="search-bar">
@@ -95,7 +95,7 @@ export default function Painel({ onPreencher, onGerenciar }) {
           </svg>
           <input
             type="text"
-            placeholder="Buscar requerimento..."
+            placeholder="Buscar template..."
             value={filtro}
             onChange={e => setFiltro(e.target.value)}
           />
@@ -111,7 +111,7 @@ export default function Painel({ onPreencher, onGerenciar }) {
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
             </svg>
-            <strong>{filtro ? 'Nenhum resultado' : 'Nenhum requerimento cadastrado'}</strong>
+            <strong>{filtro ? 'Nenhum resultado' : 'Nenhum template cadastrado'}</strong>
             <p>{filtro ? 'Tente outro termo de busca.' : 'Acesse "Gerenciar templates" para importar o primeiro template .docx.'}</p>
           </div>
         ) : (

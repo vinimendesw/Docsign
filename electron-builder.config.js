@@ -1,6 +1,6 @@
 module.exports = {
   appId: 'com.rh.sistema-requerimentos',
-  productName: 'RHdoc',
+  productName: 'Docsign',
   copyright: 'Copyright © 2025',
 
   directories: {
@@ -51,7 +51,7 @@ module.exports = {
     allowToChangeInstallationDirectory: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    shortcutName: 'RHdoc',
+    shortcutName: 'Docsign',
     language: '1046',
     deleteAppDataOnUninstall: false,
   },

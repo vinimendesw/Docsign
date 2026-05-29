@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CampoInput from '../components/CampoInput'
 
 export default function Formulario({ requerimento, onCancelar, onToast }) {
@@ -7,10 +7,18 @@ export default function Formulario({ requerimento, onCancelar, onToast }) {
     requerimento.campos.map(c => {
       if (c.tipo === 'boolean') return [c.id, false]
       if (c.tipo === 'data_hoje') return [c.id, hoje]
+      if (c.tipo === 'checkbox') return [c.id, []]
       return [c.id, '']
     })
   )
   const [valores, setValores] = useState(valoresIniciais)
+
+  useEffect(() => {
+    if (!requerimento.usarAssinatura || !requerimento.campoAssinaturaId) return
+    window.rh.lerConfiguracoes().then(cfg => {
+      setValores(v => ({ ...v, [requerimento.campoAssinaturaId]: cfg.assinatura ?? '' }))
+    }).catch(() => {})
+  }, [])
   const [erros, setErros] = useState({})
   const [gerando, setGerando] = useState(false)
   const [resultado, setResultado] = useState(null)
@@ -25,7 +33,8 @@ export default function Formulario({ requerimento, onCancelar, onToast }) {
     const novosErros = {}
     for (const campo of requerimento.campos) {
       const val = valores[campo.id]
-      if (campo.obrigatorio && (val === undefined || val === null || val === '')) {
+      const vazio = val === undefined || val === null || val === '' || (Array.isArray(val) && val.length === 0)
+      if (campo.obrigatorio && vazio) {
         novosErros[campo.id] = 'Campo obrigatório'
       }
     }
@@ -178,7 +187,7 @@ export default function Formulario({ requerimento, onCancelar, onToast }) {
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
-                Detalhes do requerimento
+                Detalhes do template
               </div>
               <div className="info-row">
                 <span className="info-row-label">Documento</span>

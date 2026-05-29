@@ -105,6 +105,31 @@ export default function CampoInput({ campo, valor, onChange, erro }) {
         </select>
       )}
 
+      {/* ── checkbox (seleção múltipla) ── */}
+      {campo.tipo === 'checkbox' && (
+        <div className="form-checkbox-group">
+          {(campo.opcoes ?? []).map(op => {
+            const selecionados = Array.isArray(valor) ? valor : []
+            const marcado = selecionados.includes(op)
+            return (
+              <label key={op} className="form-checkbox-item">
+                <input
+                  type="checkbox"
+                  checked={marcado}
+                  onChange={() => {
+                    const novo = marcado
+                      ? selecionados.filter(v => v !== op)
+                      : [...selecionados, op]
+                    onChange(campo.id, novo)
+                  }}
+                />
+                <span className="form-checkbox-label">{op}</span>
+              </label>
+            )
+          })}
+        </div>
+      )}
+
       {erro && <div className="form-error">{erro}</div>}
     </div>
   )

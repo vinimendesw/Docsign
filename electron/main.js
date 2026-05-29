@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const { pathToFileURL } = require('url')
@@ -19,7 +19,7 @@ function createWindow() {
       nodeIntegration: false,
     },
     titleBarStyle: 'default',
-    title: 'Sistema de Requerimentos RH',
+    title: 'Docsign',
   })
 
   if (isDev) {
@@ -30,6 +30,41 @@ function createWindow() {
     const indexPath = path.join(__dirname, '../dist/index.html')
     mainWindow.loadURL(pathToFileURL(indexPath).href)
   }
+
+  // ── Context menu (botão direito) com Recortar / Copiar / Colar ──
+  mainWindow.webContents.on('context-menu', (_e, params) => {
+    const { isEditable, selectionText, editFlags } = params
+    const temSelecao = selectionText.trim().length > 0
+
+    // Só exibe o menu se estiver em campo editável ou houver texto selecionado
+    if (!isEditable && !temSelecao) return
+
+    const menu = Menu.buildFromTemplate([
+      {
+        label: 'Recortar',
+        role: 'cut',
+        enabled: isEditable && editFlags.canCut && temSelecao,
+      },
+      {
+        label: 'Copiar',
+        role: 'copy',
+        enabled: editFlags.canCopy && temSelecao,
+      },
+      {
+        label: 'Colar',
+        role: 'paste',
+        enabled: isEditable && editFlags.canPaste,
+      },
+      { type: 'separator' },
+      {
+        label: 'Selecionar tudo',
+        role: 'selectAll',
+        enabled: isEditable,
+      },
+    ])
+
+    menu.popup({ window: mainWindow })
+  })
 
   // Exibe erro se o HTML não carregar (caminho errado, arquivo ausente etc.)
   mainWindow.webContents.on('did-fail-load', (_, errorCode, errorDesc) => {
@@ -56,6 +91,9 @@ function ensureDirectories() {
 }
 
 app.whenReady().then(async () => {
+  // Remove o menu nativo (barra de menus) em todas as plataformas
+  Menu.setApplicationMenu(null)
+
   ensureDirectories()
 
   try {

@@ -8,6 +8,7 @@ function configAtual() {
   return {
     pastaGerados: getPastaGerados(),
     personalizada: !!s.pastaGerados,
+    assinatura: s.assinatura ?? '',
   }
 }
 
@@ -41,4 +42,10 @@ ipcMain.handle('rh:resetar-pasta-gerados', () => {
 ipcMain.handle('rh:abrir-pasta-gerados', () => {
   shell.openPath(getPastaGerados())
   return { ok: true }
+})
+
+ipcMain.handle('rh:salvar-assinatura', (_, assinatura) => {
+  const s = readSettings()
+  writeSettings({ ...s, assinatura: String(assinatura ?? '') })
+  return configAtual()
 })

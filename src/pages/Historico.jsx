@@ -116,7 +116,7 @@ export default function Historico({ onToast }) {
           </svg>
           <input
             type="text"
-            placeholder="Filtrar por requerimento ou categoria..."
+            placeholder="Filtrar por template ou categoria..."
             value={filtro}
             onChange={e => setFiltro(e.target.value)}
           />
@@ -136,7 +136,7 @@ export default function Historico({ onToast }) {
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
             <strong>{filtro ? 'Nenhum resultado' : 'Nenhum documento gerado ainda'}</strong>
-            <p>{filtro ? 'Tente outro termo.' : 'Volte ao painel e preencha um requerimento para gerar o primeiro documento.'}</p>
+            <p>{filtro ? 'Tente outro termo.' : 'Volte ao painel e preencha um template para gerar o primeiro documento.'}</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -158,7 +158,7 @@ export default function Historico({ onToast }) {
                     <table className="rh-table">
                       <thead>
                         <tr>
-                          <th>Requerimento</th>
+                          <th>Template</th>
                           <th>Horário</th>
                           <th>Resumo</th>
                           <th>Arquivo</th>
@@ -169,7 +169,7 @@ export default function Historico({ onToast }) {
                         {itens.map(item => (
                           <tr key={item.id}>
                             <td>
-                              <div className="table-name">{item.requerimento_nome ?? 'Requerimento removido'}</div>
+                              <div className="table-name">{item.requerimento_nome ?? 'Template removido'}</div>
                               {item.categoria && <div className="table-file">{item.categoria}</div>}
                             </td>
                             <td style={{ color: 'var(--text-muted)', fontSize: '12px', whiteSpace: 'nowrap' }}>

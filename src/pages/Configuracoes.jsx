@@ -4,6 +4,8 @@ export default function Configuracoes({ onToast }) {
   const [config, setConfig] = useState(null)
   const [carregando, setCarregando] = useState(true)
   const [alterando, setAlterando] = useState(false)
+  const [assinatura, setAssinatura] = useState('')
+  const [salvandoAssinatura, setSalvandoAssinatura] = useState(false)
 
   useEffect(() => {
     carregar()
@@ -14,6 +16,7 @@ export default function Configuracoes({ onToast }) {
       setCarregando(true)
       const dados = await window.rh.lerConfiguracoes()
       setConfig(dados)
+      setAssinatura(dados.assinatura ?? '')
     } catch (e) {
       console.error(e)
     } finally {
@@ -43,6 +46,19 @@ export default function Configuracoes({ onToast }) {
       onToast?.('Pasta restaurada', 'Usando pasta padrão do sistema.')
     } catch (e) {
       onToast?.('Erro', e?.message ?? 'Não foi possível restaurar.')
+    }
+  }
+
+  async function handleSalvarAssinatura() {
+    setSalvandoAssinatura(true)
+    try {
+      const novoConfig = await window.rh.salvarAssinatura(assinatura)
+      setConfig(novoConfig)
+      onToast?.('Assinatura salva', 'Configuração atualizada com sucesso.')
+    } catch (e) {
+      onToast?.('Erro', e?.message ?? 'Não foi possível salvar a assinatura.')
+    } finally {
+      setSalvandoAssinatura(false)
     }
   }
 
@@ -172,6 +188,58 @@ export default function Configuracoes({ onToast }) {
               </div>
             </div>
 
+            {/* Assinatura */}
+            <div className="info-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', gap: 12
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 8,
+                  background: 'var(--accent)', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#141412" strokeWidth="2.5" width="18" height="18">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>
+                    Assinatura do usuário
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: 2 }}>
+                    Nome ou identificação que aparecerá nos documentos gerados
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '16px 20px' }}>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>
+                    Nome / Assinatura
+                  </div>
+                  <textarea
+                    className="form-textarea"
+                    placeholder="Ex: João da Silva&#10;Analista de RH"
+                    value={assinatura}
+                    onChange={e => setAssinatura(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSalvarAssinatura}
+                  disabled={salvandoAssinatura}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  {salvandoAssinatura ? 'Salvando...' : 'Salvar assinatura'}
+                </button>
+              </div>
+            </div>
+
             {/* Info card */}
             <div className="info-card">
               <div className="info-card-title">
@@ -184,7 +252,7 @@ export default function Configuracoes({ onToast }) {
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.8 }}>
                 <p style={{ margin: '0 0 8px' }}>
                   Ao gerar um documento, o arquivo <strong style={{ fontFamily: "'DM Mono', monospace", fontSize: '11px' }}>.docx</strong> é
-                  salvo nesta pasta com um nome único baseado no requerimento e na data/hora.
+                  salvo nesta pasta com um nome único baseado no template e na data/hora.
                 </p>
                 <p style={{ margin: 0 }}>
                   A pasta padrão fica dentro do diretório de dados do aplicativo. Você pode alterar para
@@ -200,7 +268,7 @@ export default function Configuracoes({ onToast }) {
               textAlign: 'center',
               paddingTop: 8
             }}>
-              RHdoc · Versão 1.0.0
+              Docsign · Versão 1.0.0
             </div>
           </div>
         )}

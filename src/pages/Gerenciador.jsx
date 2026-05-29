@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-const TIPOS = ['text', 'cpf', 'date', 'data_hoje', 'number', 'boolean', 'select']
+const TIPOS = ['text', 'cpf', 'date', 'data_hoje', 'number', 'boolean', 'select', 'checkbox']
 
 const TIPOS_LABEL = {
   text: 'Texto',
@@ -10,7 +10,8 @@ const TIPOS_LABEL = {
   data_hoje: 'Data — preenche hoje automaticamente',
   number: 'Número',
   boolean: 'Sim / Não (toggle)',
-  select: 'Seleção de opções',
+  select: 'Seleção única (dropdown)',
+  checkbox: 'Seleção múltipla (checkboxes)',
 }
 
 const campoVazio = () => ({ id: '', label: '', tipo: 'text', obrigatorio: true, placeholder: '', opcoes: '' })
@@ -30,7 +31,7 @@ export default function Gerenciador({ onToast }) {
   function novoRequerimento() {
     setModal({
       modo: 'novo',
-      form: { id: uuidv4(), nome: '', categoria: '', arquivo: '', campos: [campoVazio()], _nomeOriginal: '' }
+      form: { id: uuidv4(), nome: '', categoria: '', arquivo: '', campos: [campoVazio()], _nomeOriginal: '', usarAssinatura: false, campoAssinaturaId: 'assinatura' }
     })
   }
 
@@ -44,6 +45,8 @@ export default function Gerenciador({ onToast }) {
           opcoes: Array.isArray(c.opcoes) ? c.opcoes.join(', ') : (c.opcoes ?? ''),
         })),
         _nomeOriginal: req.arquivo,
+        usarAssinatura: req.usarAssinatura ?? false,
+        campoAssinaturaId: req.campoAssinaturaId ?? 'assinatura',
       }
     })
   }
@@ -88,15 +91,20 @@ export default function Gerenciador({ onToast }) {
       tipo: c.tipo,
       obrigatorio: !!c.obrigatorio,
       ...(c.placeholder ? { placeholder: c.placeholder } : {}),
-      ...(c.tipo === 'select' ? { opcoes: c.opcoes.split(',').map(s => s.trim()).filter(Boolean) } : {}),
+      ...((c.tipo === 'select' || c.tipo === 'checkbox') ? { opcoes: (c.opcoes ?? '').split(',').map(s => s.trim()).filter(Boolean) } : {}),
     }))
 
     setSalvando(true)
     try {
-      await window.rh.salvarRequerimento({ ...form, campos })
+      await window.rh.salvarRequerimento({
+        ...form,
+        campos,
+        usarAssinatura: !!form.usarAssinatura,
+        campoAssinaturaId: form.usarAssinatura ? (form.campoAssinaturaId || 'assinatura') : '',
+      })
       await carregar()
       fecharModal()
-      onToast?.('Requerimento salvo', form.nome)
+      onToast?.('Template salvo', form.nome)
     } catch (e) {
       onToast?.('Erro ao salvar')
     } finally {
@@ -108,7 +116,7 @@ export default function Gerenciador({ onToast }) {
     if (!confirm(`Desativar "${req.nome}"?`)) return
     await window.rh.excluirRequerimento(req.id)
     await carregar()
-    onToast?.('Requerimento desativado', req.nome)
+    onToast?.('Template desativado', req.nome)
   }
 
   async function toggle(req) {
@@ -149,7 +157,7 @@ export default function Gerenciador({ onToast }) {
             <div className="manager-sub">
               Gerencie os modelos disponíveis no painel. Importe um arquivo{' '}
               <code style={{ fontFamily: "'DM Mono', monospace", fontSize: '11px', background: 'var(--surface2)', padding: '1px 6px', borderRadius: '4px' }}>.docx</code>{' '}
-              para adicionar um novo tipo de requerimento.
+              para adicionar um novo tipo de documento.
             </div>
           </div>
         </div>
@@ -174,7 +182,7 @@ export default function Gerenciador({ onToast }) {
             <table className="rh-table">
               <thead>
                 <tr>
-                  <th>Requerimento</th>
+                  <th>Template</th>
                   <th>Categoria</th>
                   <th>Campos</th>
                   <th>Status</th>
@@ -241,7 +249,7 @@ export default function Gerenciador({ onToast }) {
           <div className="modal">
             <div className="modal-header">
               <div className="modal-title">
-                {modal.modo === 'novo' ? 'Novo requerimento' : `Editar: ${form.nome || '...'}`}
+                {modal.modo === 'novo' ? 'Novo template' : `Editar: ${form.nome || '...'}`}
               </div>
               <button className="icon-btn" onClick={fecharModal}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -313,10 +321,10 @@ export default function Gerenciador({ onToast }) {
                           <input className="form-input" style={{ padding: '7px 10px', fontSize: '12px' }} value={campo.placeholder ?? ''} onChange={e => handleCampo(i, 'placeholder', e.target.value)} placeholder="Texto de ajuda (opcional)"/>
                         </div>
                       )}
-                      {campo.tipo === 'select' && (
+                      {(campo.tipo === 'select' || campo.tipo === 'checkbox') && (
                         <div style={{ flex: 1 }}>
                           <div className="form-label" style={{ fontSize: '10px', marginBottom: 4 }}>Opções (separadas por vírgula)</div>
-                          <input className="form-input" style={{ padding: '7px 10px', fontSize: '12px' }} value={campo.opcoes ?? ''} onChange={e => handleCampo(i, 'opcoes', e.target.value)} placeholder="Opção A, Opção B"/>
+                          <input className="form-input" style={{ padding: '7px 10px', fontSize: '12px' }} value={campo.opcoes ?? ''} onChange={e => handleCampo(i, 'opcoes', e.target.value)} placeholder="Opção A, Opção B, Opção C"/>
                         </div>
                       )}
                       <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '12px', color: 'var(--text-secondary)', cursor: 'pointer', marginTop: 18, whiteSpace: 'nowrap' }}>
@@ -332,12 +340,45 @@ export default function Gerenciador({ onToast }) {
                   </div>
                 ))}
               </div>
+
+              {/* Assinatura */}
+              <div style={{ marginTop: 18, padding: '14px 16px', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', background: 'var(--bg)' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={!!form.usarAssinatura}
+                    onChange={e => handleForm('usarAssinatura', e.target.checked)}
+                    style={{ accentColor: 'var(--accent)', width: 15, height: 15 }}
+                  />
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>Incluir assinatura do usuário</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: 2 }}>
+                      Preenche automaticamente com a assinatura configurada nas Configurações
+                    </div>
+                  </div>
+                </label>
+                {form.usarAssinatura && (
+                  <div style={{ marginTop: 12 }}>
+                    <div className="form-label" style={{ fontSize: '10px', marginBottom: 4 }}>ID da variável no .docx</div>
+                    <input
+                      className="form-input"
+                      style={{ padding: '7px 10px', fontSize: '12px', fontFamily: "'DM Mono', monospace", maxWidth: 220 }}
+                      value={form.campoAssinaturaId}
+                      onChange={e => handleForm('campoAssinaturaId', e.target.value)}
+                      placeholder="assinatura"
+                    />
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: 6 }}>
+                      Use <code style={{ fontFamily: "'DM Mono', monospace", background: 'var(--surface2)', padding: '1px 5px', borderRadius: 3 }}>{'{{' + (form.campoAssinaturaId || 'assinatura') + '}}'}</code> no seu arquivo .docx
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="modal-footer">
               <button className="btn btn-ghost" onClick={fecharModal}>Cancelar</button>
               <button className="btn btn-primary" onClick={salvar} disabled={salvando}>
-                {salvando ? 'Salvando...' : 'Salvar requerimento'}
+                {salvando ? 'Salvando...' : 'Salvar template'}
               </button>
             </div>
           </div>

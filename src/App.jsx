@@ -9,6 +9,7 @@ import Toast from './components/Toast'
 
 export default function App() {
   const [pagina, setPagina] = useState('painel')
+  const [sidebarAberta, setSidebarAberta] = useState(true)
   const [requerimentoSelecionado, setRequerimentoSelecionado] = useState(null)
   const [toast, setToast] = useState(null)
   const [totalAtivos, setTotalAtivos] = useState(0)
@@ -95,7 +96,7 @@ export default function App() {
   return (
     <div className="app">
       {/* ── SIDEBAR ── */}
-      <nav className="sidebar">
+      <nav className={`sidebar${sidebarAberta ? '' : ' collapsed'}`}>
         <div className="sidebar-logo">
           <div className="logo-mark">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" color="#141412">
@@ -106,9 +107,20 @@ export default function App() {
             </svg>
           </div>
           <div className="logo-text">
-            RHdoc
-            <small>Requerimentos</small>
+            Docsign
+            <small>Documentos</small>
           </div>
+          <button className="sidebar-toggle" onClick={() => setSidebarAberta(a => !a)} title={sidebarAberta ? 'Recolher menu' : 'Expandir menu'}>
+            {sidebarAberta ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            )}
+          </button>
         </div>
 
         <div className="sidebar-section">
@@ -118,9 +130,10 @@ export default function App() {
               key={item.id}
               className={`nav-item${paginaAtiva === item.id ? ' active' : ''}`}
               onClick={() => irPara(item.id)}
+              title={!sidebarAberta ? item.label : undefined}
             >
               <span className="nav-icon">{item.icon}</span>
-              {item.label}
+              <span className="nav-label">{item.label}</span>
               {item.badge && <span className="nav-badge">{item.badge}</span>}
             </button>
           ))}
@@ -133,9 +146,10 @@ export default function App() {
               key={item.id}
               className={`nav-item${paginaAtiva === item.id ? ' active' : ''}`}
               onClick={() => irPara(item.id)}
+              title={!sidebarAberta ? item.label : undefined}
             >
               <span className="nav-icon">{item.icon}</span>
-              {item.label}
+              <span className="nav-label">{item.label}</span>
             </button>
           ))}
         </div>
@@ -144,7 +158,7 @@ export default function App() {
           <div className="sidebar-user">
             <div className="avatar">RH</div>
             <div className="user-info">
-              <div className="user-name">Departamento RH</div>
+              <div className="user-name">Docsign</div>
               <div className="user-role">Administrador</div>
             </div>
           </div>

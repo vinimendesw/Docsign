@@ -1,8 +1,8 @@
 {
   "name": "sistema-rh",
   "version": "1.0.6",
-  "description": "Sistema de Requerimentos de RH",
-  "author": "Departamento RH",
+  "description": "Docsign — Sistema de geração de documentos",
+  "author": "Docsign",
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",

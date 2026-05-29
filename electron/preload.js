@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld('rh', {
   escolherPastaGerados: () => ipcRenderer.invoke('rh:escolher-pasta-gerados'),
   resetarPastaGerados: () => ipcRenderer.invoke('rh:resetar-pasta-gerados'),
   abrirPastaGerados: () => ipcRenderer.invoke('rh:abrir-pasta-gerados'),
+  salvarAssinatura: (assinatura) => ipcRenderer.invoke('rh:salvar-assinatura', assinatura),
 
   // Atualizações automáticas
   onUpdateAvailable:  (cb) => ipcRenderer.on('update:available',  (_, info) => cb(info)),
