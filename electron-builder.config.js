@@ -42,7 +42,7 @@ module.exports = {
 
   win: {
     target: [{ target: 'nsis', arch: ['x64'] }],
-    //icon: 'electron/assets/icon.ico', 
+    icon: 'electron/assets/icon.ico',
   },
 
   nsis: {
