@@ -1,6 +1,16 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
 contextBridge.exposeInMainWorld('rh', {
+  // Autenticação
+  login: (login, senha) => ipcRenderer.invoke('rh:login', login, senha),
+  logout: () => ipcRenderer.invoke('rh:logout'),
+  usuarioAtual: () => ipcRenderer.invoke('rh:usuario-atual'),
+  listarUsuarios: () => ipcRenderer.invoke('rh:listar-usuarios'),
+  criarUsuario: (dados) => ipcRenderer.invoke('rh:criar-usuario', dados),
+  atualizarUsuario: (id, dados) => ipcRenderer.invoke('rh:atualizar-usuario', id, dados),
+  alterarSenha: (id, novaSenha) => ipcRenderer.invoke('rh:alterar-senha', id, novaSenha),
+  alterarMinhaSenha: (senhaAtual, novaSenha) => ipcRenderer.invoke('rh:alterar-minha-senha', senhaAtual, novaSenha),
+
   // Templates / Requerimentos
   listarRequerimentos: () => ipcRenderer.invoke('rh:listar-requerimentos'),
   importarTemplate: () => ipcRenderer.invoke('rh:importar-template'),

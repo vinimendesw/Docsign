@@ -99,6 +99,7 @@ app.whenReady().then(async () => {
   try {
     const { initDb } = require('./ipc/db')
     await initDb()
+    require('./ipc/auth')
     require('./ipc/templates')
     require('./ipc/documentos')
     require('./ipc/configuracoes')

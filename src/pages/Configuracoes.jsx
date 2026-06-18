@@ -6,6 +6,9 @@ export default function Configuracoes({ onToast }) {
   const [alterando, setAlterando] = useState(false)
   const [assinatura, setAssinatura] = useState('')
   const [salvandoAssinatura, setSalvandoAssinatura] = useState(false)
+  const [senhaAtual, setSenhaAtual] = useState('')
+  const [novaSenha, setNovaSenha] = useState('')
+  const [alterandoSenha, setAlterandoSenha] = useState(false)
 
   useEffect(() => {
     carregar()
@@ -67,6 +70,24 @@ export default function Configuracoes({ onToast }) {
       await window.rh.abrirPastaGerados()
     } catch (e) {
       onToast?.('Erro', e?.message ?? 'Não foi possível abrir a pasta.')
+    }
+  }
+
+  async function handleAlterarSenha() {
+    if (!senhaAtual || !novaSenha) {
+      onToast?.('Erro', 'Informe a senha atual e a nova senha.')
+      return
+    }
+    setAlterandoSenha(true)
+    try {
+      await window.rh.alterarMinhaSenha(senhaAtual, novaSenha)
+      setSenhaAtual('')
+      setNovaSenha('')
+      onToast?.('Senha alterada', 'Sua senha foi atualizada com sucesso.')
+    } catch (e) {
+      onToast?.('Erro', e?.message ?? 'Não foi possível alterar a senha.')
+    } finally {
+      setAlterandoSenha(false)
     }
   }
 
@@ -236,6 +257,68 @@ export default function Configuracoes({ onToast }) {
                     <polyline points="20 6 9 17 4 12"/>
                   </svg>
                   {salvandoAssinatura ? 'Salvando...' : 'Salvar assinatura'}
+                </button>
+              </div>
+            </div>
+
+            {/* Alterar senha */}
+            <div className="info-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', gap: 12
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 8,
+                  background: 'var(--accent)', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#141412" strokeWidth="2.5" width="18" height="18">
+                    <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>
+                    Alterar minha senha
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: 2 }}>
+                    Atualize sua senha de acesso ao sistema
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ padding: '16px 20px' }}>
+                <div className="form-group">
+                  <label className="form-label">Senha atual</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    value={senhaAtual}
+                    onChange={e => setSenhaAtual(e.target.value)}
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Nova senha</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    value={novaSenha}
+                    onChange={e => setNovaSenha(e.target.value)}
+                    placeholder="mín. 4 caracteres"
+                    autoComplete="new-password"
+                  />
+                </div>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleAlterarSenha}
+                  disabled={alterandoSenha}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  {alterandoSenha ? 'Salvando...' : 'Alterar senha'}
                 </button>
               </div>
             </div>

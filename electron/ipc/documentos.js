@@ -6,6 +6,7 @@ const PizZip = require('pizzip')
 const Docxtemplater = require('docxtemplater')
 const { getDb } = require('./db')
 const { getPastaGerados } = require('./settings')
+const { getUsuarioAtual } = require('./auth')
 
 ipcMain.handle('rh:gerar-documento', (_, requerimentoId, dados) => {
   const db = getDb()
@@ -71,9 +72,9 @@ ipcMain.handle('rh:gerar-documento', (_, requerimentoId, dados) => {
 
   // Armazena caminho completo para facilitar abertura no histórico
   db.prepare(`
-    INSERT INTO documentos_gerados (requerimento_id, dados, arquivo_gerado)
-    VALUES (?, ?, ?)
-  `).run(requerimentoId, JSON.stringify(dados), destino)
+    INSERT INTO documentos_gerados (requerimento_id, dados, arquivo_gerado, usuario_login)
+    VALUES (?, ?, ?, ?)
+  `).run(requerimentoId, JSON.stringify(dados), destino, getUsuarioAtual()?.login ?? null)
 
   return destino
 })
@@ -244,9 +245,9 @@ ipcMain.handle('rh:gerar-documentos-em-massa', (_, requerimentoId, registros) =>
       fs.writeFileSync(destino, buffer)
 
       db.prepare(`
-        INSERT INTO documentos_gerados (requerimento_id, dados, arquivo_gerado)
-        VALUES (?, ?, ?)
-      `).run(requerimentoId, JSON.stringify(registro), destino)
+        INSERT INTO documentos_gerados (requerimento_id, dados, arquivo_gerado, usuario_login)
+        VALUES (?, ?, ?, ?)
+      `).run(requerimentoId, JSON.stringify(registro), destino, getUsuarioAtual()?.login ?? null)
 
       return { indice: idx + 1, ok: true, arquivo: destino, erro: null }
     } catch (err) {

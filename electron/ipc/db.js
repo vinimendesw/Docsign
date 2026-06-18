@@ -101,10 +101,50 @@ async function initDb() {
     )
   `)
 
+  dbWrapper._db.run(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+      id TEXT PRIMARY KEY,
+      nome TEXT NOT NULL,
+      login TEXT NOT NULL UNIQUE,
+      senha_hash TEXT NOT NULL,
+      papel TEXT NOT NULL DEFAULT 'operador',
+      ativo INTEGER DEFAULT 1,
+      criado_em TEXT DEFAULT (datetime('now'))
+    )
+  `)
+
+  migrarColunas()
   dbWrapper._save()
   seedInicial()
+  seedUsuarioAdmin()
 
   return dbWrapper
+}
+
+/** Adiciona colunas novas em tabelas já existentes (instalações antigas), sem quebrar se já existirem */
+function migrarColunas() {
+  try {
+    dbWrapper._db.run('ALTER TABLE documentos_gerados ADD COLUMN usuario_login TEXT')
+  } catch (e) {
+    // Coluna já existe — ignora
+  }
+}
+
+/** Garante que sempre exista pelo menos um usuário administrador */
+function seedUsuarioAdmin() {
+  const bcrypt = require('bcryptjs')
+  const { v4: uuidv4 } = require('uuid')
+
+  const total = dbWrapper.prepare('SELECT COUNT(*) as total FROM usuarios').get().total
+  if (total > 0) return
+
+  const senhaHash = bcrypt.hashSync('admin123', 10)
+  dbWrapper.prepare(`
+    INSERT INTO usuarios (id, nome, login, senha_hash, papel)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(uuidv4(), 'Administrador', 'admin', senhaHash, 'admin')
+
+  console.log('[Docsign] Usuário administrador padrão criado — login: admin / senha: admin123. Altere a senha após o primeiro acesso.')
 }
 
 
