@@ -5,8 +5,6 @@ import Gerenciador from './pages/Gerenciador'
 import Historico from './pages/Historico'
 import Configuracoes from './pages/Configuracoes'
 import GeracaoEmMassa from './pages/GeracaoEmMassa'
-import Usuarios from './pages/Usuarios'
-import Login from './pages/Login'
 import Toast from './components/Toast'
 
 export default function App() {
@@ -18,41 +16,14 @@ export default function App() {
   const [updateAvailable, setUpdateAvailable] = useState(null)   // { version }
   const [updateReady, setUpdateReady] = useState(null)           // { version }
   const [updateProgress, setUpdateProgress] = useState(null)     // 0-100 ou null
-  const [usuarioLogado, setUsuarioLogado] = useState(null)
-  const [verificandoSessao, setVerificandoSessao] = useState(true)
-
-  // Verifica se já existe uma sessão ativa no processo main (ex: após reload do renderer)
-  useEffect(() => {
-    if (!window.rh) {
-      setVerificandoSessao(false)
-      return
-    }
-    window.rh.usuarioAtual()
-      .then(u => setUsuarioLogado(u))
-      .catch(() => {})
-      .finally(() => setVerificandoSessao(false))
-  }, [])
 
   useEffect(() => {
-    if (window.rh && usuarioLogado) {
+    if (window.rh) {
       window.rh.listarRequerimentos().then(lista => {
         setTotalAtivos(lista.filter(r => r.ativo).length)
       }).catch(() => {})
     }
-  }, [pagina, usuarioLogado])
-
-  function mostrarToast(titulo, sub) {
-    setToast({ titulo, sub })
-    setTimeout(() => setToast(null), 3200)
-  }
-
-  async function handleLogout() {
-    try {
-      await window.rh.logout()
-    } catch {}
-    setUsuarioLogado(null)
-    setPagina('painel')
-  }
+  }, [pagina])
 
   // Escuta eventos do auto-updater (só chegam em produção)
   useEffect(() => {
@@ -69,6 +40,11 @@ export default function App() {
       setUpdateProgress(null)
     })
   }, [])
+
+  function mostrarToast(titulo, sub) {
+    setToast({ titulo, sub })
+    setTimeout(() => setToast(null), 3200)
+  }
 
   function abrirFormulario(req) {
     setRequerimentoSelecionado(req)
@@ -101,20 +77,12 @@ export default function App() {
     )},
   ]
 
-  const ehAdmin = usuarioLogado?.papel === 'admin'
-
   const navAdmin = [
     { id: 'gerenciador', label: 'Gerenciar templates', icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
         <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
       </svg>
     )},
-    ...(ehAdmin ? [{ id: 'usuarios', label: 'Usuários', icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-    )}] : []),
     { id: 'configuracoes', label: 'Configurações', icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
         <circle cx="12" cy="12" r="3"/>
@@ -124,14 +92,6 @@ export default function App() {
   ]
 
   const paginaAtiva = pagina === 'formulario' ? 'formulario' : pagina
-
-  if (verificandoSessao) {
-    return <div style={{ height: '100vh', background: 'var(--sidebar-bg)' }} />
-  }
-
-  if (!usuarioLogado) {
-    return <Login onLogin={setUsuarioLogado} />
-  }
 
   return (
     <div className="app">
@@ -195,20 +155,12 @@ export default function App() {
         </div>
 
         <div className="sidebar-footer">
-          <div className="sidebar-user" title="Sair" onClick={handleLogout} style={{ justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-              <div className="avatar">{(usuarioLogado.nome || '?').slice(0, 2).toUpperCase()}</div>
-              <div className="user-info">
-                <div className="user-name">{usuarioLogado.nome}</div>
-                <div className="user-role">{usuarioLogado.papel === 'admin' ? 'Administrador' : 'Operador'}</div>
-              </div>
+          <div className="sidebar-user">
+            <div className="avatar">RH</div>
+            <div className="user-info">
+              <div className="user-name">Docsign</div>
+              <div className="user-role">Administrador</div>
             </div>
-            {sidebarAberta && (
-              <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth="2" width="14" height="14" style={{ flexShrink: 0 }}>
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-              </svg>
-            )}
           </div>
         </div>
       </nav>
@@ -270,9 +222,6 @@ export default function App() {
         )}
         {pagina === 'gerenciador' && (
           <Gerenciador onToast={mostrarToast} />
-        )}
-        {pagina === 'usuarios' && ehAdmin && (
-          <Usuarios usuarioLogado={usuarioLogado} onToast={mostrarToast} />
         )}
         {pagina === 'historico' && (
           <Historico onToast={mostrarToast} />

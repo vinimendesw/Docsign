@@ -1,6 +1,6 @@
 {
   "name": "sistema-rh",
-  "version": "1.0.7",
+  "version": "1.0.6",
   "description": "Docsign — Sistema de geração de documentos",
   "author": "Docsign",
   "main": "electron/main.js",
@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
     "docxtemplater": "^3.49.0",
     "electron-updater": "^6.8.3",
     "pizzip": "^3.1.7",
