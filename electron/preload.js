@@ -17,11 +17,6 @@ contextBridge.exposeInMainWorld('rh', {
   listarHistorico: () => ipcRenderer.invoke('rh:listar-historico'),
   listarDocumentosGerados: (requerimentoId) => ipcRenderer.invoke('rh:listar-documentos-gerados', requerimentoId),
 
-  // Geração em massa
-  modeloJsonEmMassa: (requerimentoId) => ipcRenderer.invoke('rh:modelo-json-em-massa', requerimentoId),
-  importarJson: () => ipcRenderer.invoke('rh:importar-json'),
-  gerarDocumentosEmMassa: (requerimentoId, registros) => ipcRenderer.invoke('rh:gerar-documentos-em-massa', requerimentoId, registros),
-
   // Configurações
   lerConfiguracoes: () => ipcRenderer.invoke('rh:ler-configuracoes'),
   escolherPastaGerados: () => ipcRenderer.invoke('rh:escolher-pasta-gerados'),

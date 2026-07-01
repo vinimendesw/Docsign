@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Icon from '../components/Icon'
 
 function formatarData(isoStr) {
   if (!isoStr) return '—'
@@ -73,10 +74,7 @@ export default function Historico({ onToast }) {
         </div>
         <div className="topbar-actions">
           <button className="btn btn-ghost" onClick={carregar}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="23 4 23 10 17 10"/>
-              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
-            </svg>
+            <Icon name="refresh" size={14} />
             Atualizar
           </button>
         </div>
@@ -91,10 +89,7 @@ export default function Historico({ onToast }) {
               <div className="stat-label">Total de documentos gerados</div>
             </div>
             <div className="stat-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
+              <Icon name="document" size={16} />
             </div>
           </div>
           <div className="stat-card">
@@ -103,20 +98,16 @@ export default function Historico({ onToast }) {
               <div className="stat-label">Arquivos disponíveis em disco</div>
             </div>
             <div className="stat-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
+              <Icon name="activity" size={16} />
             </div>
           </div>
         </div>
 
         <div className="search-bar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
+          <Icon name="search" size={15} />
           <input
             type="text"
-            placeholder="Filtrar por template ou categoria..."
+            placeholder="Filtrar por modelo ou categoria..."
             value={filtro}
             onChange={e => setFiltro(e.target.value)}
           />
@@ -132,11 +123,9 @@ export default function Historico({ onToast }) {
           <div className="empty-state"><p>Carregando...</p></div>
         ) : filtrados.length === 0 ? (
           <div className="empty-state" style={{ marginTop: 40 }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
+            <Icon name="clock" size={40} />
             <strong>{filtro ? 'Nenhum resultado' : 'Nenhum documento gerado ainda'}</strong>
-            <p>{filtro ? 'Tente outro termo.' : 'Volte ao painel e preencha um template para gerar o primeiro documento.'}</p>
+            <p>{filtro ? 'Tente outro termo.' : 'Volte ao painel e preencha um modelo para gerar o primeiro documento.'}</p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -158,7 +147,7 @@ export default function Historico({ onToast }) {
                     <table className="rh-table">
                       <thead>
                         <tr>
-                          <th>Template</th>
+                          <th>Modelo</th>
                           <th>Horário</th>
                           <th>Resumo</th>
                           <th>Arquivo</th>
@@ -169,7 +158,7 @@ export default function Historico({ onToast }) {
                         {itens.map(item => (
                           <tr key={item.id}>
                             <td>
-                              <div className="table-name">{item.requerimento_nome ?? 'Template removido'}</div>
+                              <div className="table-name">{item.requerimento_nome ?? 'Modelo removido'}</div>
                               {item.categoria && <div className="table-file">{item.categoria}</div>}
                             </td>
                             <td style={{ color: 'var(--text-muted)', fontSize: '12px', whiteSpace: 'nowrap' }}>
@@ -196,10 +185,7 @@ export default function Historico({ onToast }) {
                                   onClick={() => abrir(item)}
                                   style={{ opacity: item.existe ? 1 : .4 }}
                                 >
-                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                    <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                                  </svg>
+                                  <Icon name="external-link" size={14} />
                                 </button>
                               </div>
                             </td>

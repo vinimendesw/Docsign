@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import Icon from '../components/Icon'
 
 const TIPOS = ['text', 'cpf', 'date', 'data_hoje', 'number', 'boolean', 'select', 'checkbox']
 
@@ -61,7 +62,7 @@ export default function Gerenciador({ onToast }) {
     const res = await window.rh.importarTemplate()
     if (!res) return
     setModal(m => ({ ...m, form: { ...m.form, arquivo: res.nomeArquivo, _nomeOriginal: res.nomeOriginal } }))
-    onToast?.('Template importado', res.nomeOriginal)
+    onToast?.('Modelo importado', res.nomeOriginal)
   }
 
   function handleCampo(i, key, val) {
@@ -104,7 +105,7 @@ export default function Gerenciador({ onToast }) {
       })
       await carregar()
       fecharModal()
-      onToast?.('Template salvo', form.nome)
+      onToast?.('Modelo salvo', form.nome)
     } catch (e) {
       onToast?.('Erro ao salvar')
     } finally {
@@ -116,7 +117,7 @@ export default function Gerenciador({ onToast }) {
     if (!confirm(`Desativar "${req.nome}"?`)) return
     await window.rh.excluirRequerimento(req.id)
     await carregar()
-    onToast?.('Template desativado', req.nome)
+    onToast?.('Modelo desativado', req.nome)
   }
 
   async function toggle(req) {
@@ -131,16 +132,13 @@ export default function Gerenciador({ onToast }) {
     <>
       <div className="topbar">
         <div className="topbar-left">
-          <div className="page-title">Gerenciar Templates</div>
-          <div className="breadcrumb">Início <span>›</span> Administração <span>›</span> Templates</div>
+          <div className="page-title">Gerenciar Modelos</div>
+          <div className="breadcrumb">Início <span>›</span> Administração <span>›</span> Modelos</div>
         </div>
         <div className="topbar-actions">
           <button className="btn btn-primary" onClick={novoRequerimento}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-            </svg>
-            Importar template
+            <Icon name="upload" size={14} />
+            Importar modelo
           </button>
         </div>
       </div>
@@ -148,12 +146,10 @@ export default function Gerenciador({ onToast }) {
       <div className="content">
         <div className="manager-header">
           <div className="manager-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
+            <Icon name="edit" size={20} />
           </div>
           <div>
-            <div className="manager-title">Templates cadastrados</div>
+            <div className="manager-title">Modelos cadastrados</div>
             <div className="manager-sub">
               Gerencie os modelos disponíveis no painel. Importe um arquivo{' '}
               <code style={{ fontFamily: "'DM Mono', monospace", fontSize: '11px', background: 'var(--surface2)', padding: '1px 6px', borderRadius: '4px' }}>.docx</code>{' '}
@@ -165,24 +161,21 @@ export default function Gerenciador({ onToast }) {
         <div className="table-wrapper">
           <div className="table-toolbar">
             <div className="section-title">
-              {requerimentos.filter(r => r.ativo).length} template{requerimentos.filter(r => r.ativo).length !== 1 ? 's' : ''} ativo{requerimentos.filter(r => r.ativo).length !== 1 ? 's' : ''}
+              {requerimentos.filter(r => r.ativo).length} modelo{requerimentos.filter(r => r.ativo).length !== 1 ? 's' : ''} ativo{requerimentos.filter(r => r.ativo).length !== 1 ? 's' : ''}
             </div>
           </div>
 
           {requerimentos.length === 0 ? (
             <div className="empty-state">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-              </svg>
-              <strong>Nenhum template cadastrado</strong>
-              <p>Clique em "Importar template" para adicionar o primeiro.</p>
+              <Icon name="document" size={40} />
+              <strong>Nenhum modelo cadastrado</strong>
+              <p>Clique em "Importar modelo" para adicionar o primeiro.</p>
             </div>
           ) : (
             <table className="rh-table">
               <thead>
                 <tr>
-                  <th>Template</th>
+                  <th>Modelo</th>
                   <th>Categoria</th>
                   <th>Campos</th>
                   <th>Status</th>
@@ -211,27 +204,13 @@ export default function Gerenciador({ onToast }) {
                     <td>
                       <div className="action-btns">
                         <button className="icon-btn" title="Editar" onClick={() => editarRequerimento(req)}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                          </svg>
+                          <Icon name="edit-2" size={14} />
                         </button>
                         <button className="icon-btn" title={req.ativo ? 'Desativar' : 'Ativar'} onClick={() => toggle(req)}>
-                          {req.ativo ? (
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
-                            </svg>
-                          ) : (
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
-                            </svg>
-                          )}
+                          <Icon name={req.ativo ? 'x-circle' : 'check-circle-outline'} size={14} />
                         </button>
                         <button className="icon-btn danger" title="Excluir" onClick={() => excluir(req)}>
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                            <path d="M10 11v6"/><path d="M14 11v6"/>
-                          </svg>
+                          <Icon name="trash" size={14} />
                         </button>
                       </div>
                     </td>
@@ -249,12 +228,10 @@ export default function Gerenciador({ onToast }) {
           <div className="modal">
             <div className="modal-header">
               <div className="modal-title">
-                {modal.modo === 'novo' ? 'Novo template' : `Editar: ${form.nome || '...'}`}
+                {modal.modo === 'novo' ? 'Novo modelo' : `Editar: ${form.nome || '...'}`}
               </div>
               <button className="icon-btn" onClick={fecharModal}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
+                <Icon name="x" size={14} />
               </button>
             </div>
 
@@ -272,13 +249,10 @@ export default function Gerenciador({ onToast }) {
               </div>
 
               <div style={{ marginBottom: 22 }}>
-                <div className="form-label"><span className="required-dot"/>Template .docx</div>
+                <div className="form-label"><span className="required-dot"/>Modelo .docx</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <button className="btn btn-ghost" onClick={importarTemplate}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
+                    <Icon name="upload" size={14} />
                     Selecionar arquivo
                   </button>
                   {form._nomeOriginal && (
@@ -332,9 +306,7 @@ export default function Gerenciador({ onToast }) {
                         Obrigatório
                       </label>
                       <button className="icon-btn danger" style={{ marginTop: 18 }} onClick={() => removeCampo(i)} title="Remover campo">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                        </svg>
+                        <Icon name="x" size={14} />
                       </button>
                     </div>
                   </div>
@@ -378,7 +350,7 @@ export default function Gerenciador({ onToast }) {
             <div className="modal-footer">
               <button className="btn btn-ghost" onClick={fecharModal}>Cancelar</button>
               <button className="btn btn-primary" onClick={salvar} disabled={salvando}>
-                {salvando ? 'Salvando...' : 'Salvar template'}
+                {salvando ? 'Salvando...' : 'Salvar modelo'}
               </button>
             </div>
           </div>
