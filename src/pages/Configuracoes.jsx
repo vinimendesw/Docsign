@@ -8,8 +8,15 @@ export default function Configuracoes({ onToast }) {
   const [assinatura, setAssinatura] = useState('')
   const [salvandoAssinatura, setSalvandoAssinatura] = useState(false)
 
+  const [loginCadastrado, setLoginCadastrado] = useState(false)
+  const [loginUsuario, setLoginUsuario] = useState('')
+  const [loginSenha, setLoginSenha] = useState('')
+  const [loginConfirmarSenha, setLoginConfirmarSenha] = useState('')
+  const [salvandoLogin, setSalvandoLogin] = useState(false)
+
   useEffect(() => {
     carregar()
+    window.rh?.temLoginCadastrado().then(setLoginCadastrado).catch(() => {})
   }, [])
 
   async function carregar() {
@@ -68,6 +75,34 @@ export default function Configuracoes({ onToast }) {
       await window.rh.abrirPastaGerados()
     } catch (e) {
       onToast?.('Erro', e?.message ?? 'Não foi possível abrir a pasta.')
+    }
+  }
+
+  async function handleCadastrarLogin() {
+    if (!loginUsuario.trim()) {
+      onToast?.('Erro', 'Informe um usuário.')
+      return
+    }
+    if (loginSenha.length < 6) {
+      onToast?.('Erro', 'A senha deve ter pelo menos 6 caracteres.')
+      return
+    }
+    if (loginSenha !== loginConfirmarSenha) {
+      onToast?.('Erro', 'As senhas não conferem.')
+      return
+    }
+
+    setSalvandoLogin(true)
+    try {
+      await window.rh.cadastrarLogin(loginUsuario.trim(), loginSenha)
+      setLoginCadastrado(true)
+      setLoginSenha('')
+      setLoginConfirmarSenha('')
+      onToast?.('Login salvo', 'O sistema agora exigirá login ao abrir.')
+    } catch (e) {
+      onToast?.('Erro', e?.message ?? 'Não foi possível salvar o login.')
+    } finally {
+      setSalvandoLogin(false)
     }
   }
 
@@ -221,6 +256,85 @@ export default function Configuracoes({ onToast }) {
                 >
                   <Icon name="check" size={14} />
                   {salvandoAssinatura ? 'Salvando...' : 'Salvar assinatura'}
+                </button>
+              </div>
+            </div>
+
+            {/* Login de acesso */}
+            <div className="info-card" style={{ padding: 0, overflow: 'hidden' }}>
+              <div style={{
+                padding: '16px 20px',
+                borderBottom: '1px solid var(--border)',
+                display: 'flex', alignItems: 'center', gap: 12
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: 8,
+                  background: 'var(--accent)', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', flexShrink: 0
+                }}>
+                  <Icon name="lock" size={18} color="#141412" />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)' }}>
+                    Login de acesso
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: 2 }}>
+                    Opcional: exige usuário e senha para abrir o sistema
+                  </div>
+                </div>
+                {loginCadastrado && (
+                  <span className="tag tag-active" style={{ fontSize: '10px', flexShrink: 0, marginLeft: 'auto' }}>Ativo</span>
+                )}
+              </div>
+
+              <div style={{ padding: '16px 20px' }}>
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>
+                    Usuário
+                  </div>
+                  <input
+                    className="form-input"
+                    type="text"
+                    placeholder="Ex: admin"
+                    value={loginUsuario}
+                    onChange={e => setLoginUsuario(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-row" style={{ marginBottom: 12 }}>
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>
+                      Senha
+                    </div>
+                    <input
+                      className="form-input"
+                      type="password"
+                      placeholder="Mínimo 6 caracteres"
+                      value={loginSenha}
+                      onChange={e => setLoginSenha(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>
+                      Confirmar senha
+                    </div>
+                    <input
+                      className="form-input"
+                      type="password"
+                      placeholder="Repita a senha"
+                      value={loginConfirmarSenha}
+                      onChange={e => setLoginConfirmarSenha(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  className="btn btn-primary"
+                  onClick={handleCadastrarLogin}
+                  disabled={salvandoLogin}
+                >
+                  <Icon name="check" size={14} />
+                  {salvandoLogin ? 'Salvando...' : loginCadastrado ? 'Atualizar login' : 'Cadastrar login'}
                 </button>
               </div>
             </div>

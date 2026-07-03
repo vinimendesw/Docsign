@@ -24,6 +24,11 @@ contextBridge.exposeInMainWorld('rh', {
   abrirPastaGerados: () => ipcRenderer.invoke('rh:abrir-pasta-gerados'),
   salvarAssinatura: (assinatura) => ipcRenderer.invoke('rh:salvar-assinatura', assinatura),
 
+  // Login de acesso
+  temLoginCadastrado: () => ipcRenderer.invoke('rh:tem-login-cadastrado'),
+  cadastrarLogin: (login, senha) => ipcRenderer.invoke('rh:cadastrar-login', { login, senha }),
+  validarLogin: (login, senha) => ipcRenderer.invoke('rh:validar-login', { login, senha }),
+
   // Atualizações automáticas
   onUpdateAvailable:  (cb) => ipcRenderer.on('update:available',  (_, info) => cb(info)),
   onUpdateProgress:   (cb) => ipcRenderer.on('update:progress',   (_, prog) => cb(prog)),

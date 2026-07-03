@@ -101,6 +101,15 @@ async function initDb() {
     )
   `)
 
+  dbWrapper._db.run(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      login TEXT NOT NULL,
+      senha_hash TEXT NOT NULL,
+      criado_em TEXT DEFAULT (datetime('now'))
+    )
+  `)
+
   dbWrapper._save()
   seedInicial()
 

@@ -15,7 +15,7 @@ ipcMain.handle('rh:gerar-documento', (_, requerimentoId, dados) => {
   if (!req) throw new Error('Requerimento não encontrado')
 
   const templatePath = path.join(userData, 'templates', req.arquivo)
-  if (!fs.existsSync(templatePath)) throw new Error('Template não encontrado: ' + req.arquivo)
+  if (!fs.existsSync(templatePath)) throw new Error('Modelo não encontrado: ' + req.arquivo)
 
   const content = fs.readFileSync(templatePath, 'binary')
   const zip = new PizZip(content)

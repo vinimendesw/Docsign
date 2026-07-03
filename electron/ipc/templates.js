@@ -12,7 +12,7 @@ ipcMain.handle('rh:listar-requerimentos', () => {
 
 ipcMain.handle('rh:importar-template', async () => {
   const result = await dialog.showOpenDialog({
-    title: 'Selecionar template Word',
+    title: 'Selecionar modelo Word',
     filters: [{ name: 'Word', extensions: ['docx'] }],
     properties: ['openFile'],
   })

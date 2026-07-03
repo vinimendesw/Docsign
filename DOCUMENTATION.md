@@ -16,20 +16,20 @@
 6. [Modelo de Dados](#6-modelo-de-dados)
 7. [Funcionalidades](#7-funcionalidades)
 8. [Tipos de Campo Suportados](#8-tipos-de-campo-suportados)
-9. [Como Adicionar um Template Pré-carregado (Seed)](#9-como-adicionar-um-template-pré-carregado-seed)
+9. [Como Adicionar um Modelo Pré-carregado (Seed)](#9-como-adicionar-um-modelo-pré-carregado-seed)
 10. [Guia de Uso](#10-guia-de-uso)
 11. [Como Rodar em Desenvolvimento](#11-como-rodar-em-desenvolvimento)
 12. [Build e Distribuição](#12-build-e-distribuição)
 13. [Atualizações Automáticas](#13-atualizações-automáticas)
 14. [Configurações do Usuário](#14-configurações-do-usuário)
-15. [Templates Pré-carregados (Seeds)](#15-templates-pré-carregados-seeds)
+15. [Modelos Pré-carregados (Seeds)](#15-modelos-pré-carregados-seeds)
 16. [Limitações Conhecidas](#16-limitações-conhecidas)
 
 ---
 
 ## 1. Visão Geral
 
-**Docsign** (nome interno: *RHdoc*) é uma aplicação desktop para **automação da geração de documentos institucionais de RH**. O sistema permite importar templates `.docx` com placeholders no formato `{{CAMPO}}`, preenchê-los via formulário guiado ou por ingestão de dados em lote via JSON, e exportar documentos finais prontos para impressão — tudo sem depender de serviços externos ou internet.
+**Docsign** (nome interno: *RHdoc*) é uma aplicação desktop para **automação da geração de documentos institucionais de RH**. O sistema permite importar modelos `.docx` com placeholders no formato `{{CAMPO}}`, preenchê-los via formulário guiado ou por ingestão de dados em lote via JSON, e exportar documentos finais prontos para impressão — tudo sem depender de serviços externos ou internet.
 
 O aplicativo foi desenvolvido para uso em **departamentos de RH de órgãos públicos ou empresas** que lidam com alto volume de documentos recorrentes e padronizados (requerimentos, certidões, licenças, etc.).
 
@@ -40,7 +40,7 @@ O aplicativo foi desenvolvido para uso em **departamentos de RH de órgãos púb
 | Objetivo | Descrição |
 |---|---|
 | **Eliminar retrabalho manual** | Substituir o preenchimento manual de documentos Word por um fluxo de formulário estruturado |
-| **Padronização** | Garantir que todos os documentos sigam exatamente o template aprovado |
+| **Padronização** | Garantir que todos os documentos sigam exatamente o modelo aprovado |
 | **Geração em lote** | Permitir a criação de dezenas de documentos a partir de um único arquivo JSON |
 | **Operação offline** | Funcionar sem internet, sem servidor e sem dependência de nuvem |
 | **Auto-atualização** | Distribuir novas versões automaticamente via GitHub Releases |
@@ -69,7 +69,7 @@ O aplicativo foi desenvolvido para uso em **departamentos de RH de órgãos púb
 
 | Tecnologia | Versão | Função |
 |---|---|---|
-| [docxtemplater](https://docxtemplater.com) | ^3.49.0 | Renderização de templates `.docx` com substituição de placeholders |
+| [docxtemplater](https://docxtemplater.com) | ^3.49.0 | Renderização de modelos `.docx` com substituição de placeholders |
 | [PizZip](https://github.com/open-xml-templating/pizzip) | ^3.1.7 | Leitura e escrita do formato ZIP interno do `.docx` |
 
 ### Banco de Dados
@@ -82,7 +82,7 @@ O aplicativo foi desenvolvido para uso em **departamentos de RH de órgãos púb
 
 | Tecnologia | Função |
 |---|---|
-| [uuid](https://github.com/uuidjs/uuid) | Geração de IDs únicos para templates importados |
+| [uuid](https://github.com/uuidjs/uuid) | Geração de IDs únicos para modelos importados |
 | [concurrently](https://github.com/open-cli-tools/concurrently) | Execução paralela de Vite + Electron em desenvolvimento |
 | [wait-on](https://github.com/jeffbski/wait-on) | Aguarda o servidor Vite estar disponível antes de abrir o Electron |
 
@@ -133,10 +133,10 @@ Docsign/
 │   ├── main.js                  # Entry point do Electron
 │   ├── preload.js               # Bridge segura entre main e renderer
 │   ├── assets/
-│   │   └── seeds/               # Templates .docx pré-instalados
+│   │   └── seeds/               # Modelos .docx pré-instalados
 │   └── ipc/
 │       ├── db.js                # Inicialização do SQLite + seeds
-│       ├── templates.js         # CRUD de requerimentos/templates
+│       ├── templates.js         # CRUD de requerimentos/modelos
 │       ├── documentos.js        # Geração de documentos e histórico
 │       ├── configuracoes.js     # Configurações do usuário
 │       └── settings.js          # Leitura/escrita de settings.json
@@ -148,7 +148,7 @@ Docsign/
 │   ├── pages/
 │   │   ├── Painel.jsx           # Tela inicial com cards de requerimentos
 │   │   ├── Formulario.jsx       # Formulário de preenchimento individual
-│   │   ├── Gerenciador.jsx      # CRUD de templates
+│   │   ├── Gerenciador.jsx      # CRUD de modelos
 │   │   ├── GeracaoEmMassa.jsx   # Geração batch via JSON
 │   │   ├── Historico.jsx        # Log de documentos gerados
 │   │   └── Configuracoes.jsx    # Pasta de saída e assinatura
@@ -170,7 +170,7 @@ Docsign/
 userData/
 ├── sistema.db        # Banco SQLite (gerenciado pelo sql.js)
 ├── settings.json     # Configurações do usuário (pasta de saída, assinatura)
-├── templates/        # Templates .docx (seeds + importados pelo usuário)
+├── templates/        # Modelos .docx (seeds + importados pelo usuário)
 └── gerados/          # Documentos gerados (padrão; configurável)
 ```
 
@@ -182,7 +182,7 @@ userData/
 
 | Coluna | Tipo | Descrição |
 |---|---|---|
-| `id` | TEXT PK | Identificador único do template |
+| `id` | TEXT PK | Identificador único do modelo |
 | `nome` | TEXT | Nome exibido na interface |
 | `categoria` | TEXT | Agrupamento (ex: "Requerimento", "Certidão") |
 | `arquivo` | TEXT | Nome do arquivo `.docx` em `userData/templates/` |
@@ -220,11 +220,11 @@ Cada campo no array `campos` segue este schema:
 
 ### 7.1 Painel
 
-Tela inicial que lista todos os requerimentos ativos em cards. Exibe contador de templates ativos na badge da navegação. Acesso direto ao formulário de preenchimento com um clique.
+Tela inicial que lista todos os requerimentos ativos em cards. Exibe contador de modelos ativos na badge da navegação. Acesso direto ao formulário de preenchimento com um clique.
 
 ### 7.2 Formulário de Preenchimento
 
-- Renderiza dinamicamente os campos definidos no template
+- Renderiza dinamicamente os campos definidos no modelo
 - Validação de campos obrigatórios antes da geração
 - Auto-preenchimento da data atual em campos do tipo `data_hoje`
 - Preenchimento automático de assinatura configurada nas preferências
@@ -233,33 +233,33 @@ Tela inicial que lista todos os requerimentos ativos em cards. Exibe contador de
 
 ### 7.3 Geração em Massa
 
-- Seleciona o template desejado
+- Seleciona o modelo desejado
 - Cola ou importa um array JSON com N registros
 - Validação de JSON em tempo real (feedback imediato de erros de sintaxe)
-- Botão **"Ver modelo"**: gera automaticamente um JSON de exemplo com 2 registros preenchidos com valores ilustrativos para o template selecionado
+- Botão **"Ver modelo"**: gera automaticamente um JSON de exemplo com 2 registros preenchidos com valores ilustrativos para o modelo selecionado
 - Importação de arquivo `.json` via dialog nativo
 - Barra de progresso durante a geração
 - Relatório final com status de sucesso/falha por registro
 
-### 7.4 Gerenciador de Templates
+### 7.4 Gerenciador de Modelos
 
-- Importar novos templates `.docx` via dialog de arquivo
+- Importar novos modelos `.docx` via dialog de arquivo
 - Definir nome, categoria e campos do formulário
-- Editar templates existentes
-- Arquivar (soft-delete) templates sem perder histórico
-- Reativar templates arquivados
+- Editar modelos existentes
+- Arquivar (soft-delete) modelos sem perder histórico
+- Reativar modelos arquivados
 
 ### 7.5 Histórico
 
-- Lista os últimos 200 documentos gerados (todos os templates)
-- Exibe nome do funcionário, template usado, data/hora de geração
+- Lista os últimos 200 documentos gerados (todos os modelos)
+- Exibe nome do funcionário, modelo usado, data/hora de geração
 - Indicação visual quando o arquivo gerado foi movido ou deletado
 - Reabertura do documento diretamente do histórico
 
 ### 7.6 Configurações
 
 - **Pasta de saída**: escolher diretório customizado para salvar os documentos gerados (padrão: `userData/gerados/`). Opção de restaurar para o padrão.
-- **Assinatura**: nome da assinatura padrão que é injetado automaticamente em templates que possuem o campo configurado como `campoAssinaturaId`.
+- **Assinatura**: nome da assinatura padrão que é injetado automaticamente em modelos que possuem o campo configurado como `campoAssinaturaId`.
 - Botão para abrir a pasta de saída no Explorer
 
 ### 7.7 Auto-Update
@@ -357,15 +357,15 @@ Grupo de checkboxes onde múltiplas opções podem ser selecionadas. Retorna um 
 
 ---
 
-## 9. Como Adicionar um Template Pré-carregado (Seed)
+## 9. Como Adicionar um Modelo Pré-carregado (Seed)
 
-Seeds são templates instalados automaticamente com a aplicação e sincronizados a cada atualização. Siga os passos abaixo para adicionar um novo.
+Seeds são modelos instalados automaticamente com a aplicação e sincronizados a cada atualização. Siga os passos abaixo para adicionar um novo.
 
 ### Passo 1 — Criar o arquivo .docx
 
 Crie o documento Word com os placeholders no formato `{{ID_DO_CAMPO}}`. Os IDs devem ser escritos em maiúsculo sem espaços (convenção do projeto).
 
-Exemplo de conteúdo do template:
+Exemplo de conteúdo do modelo:
 ```
 Eu, {{NOME}}, portador do CPF {{CPF}}, ocupante do cargo {{N_CARGO}},
 venho por meio deste requerer...
@@ -387,7 +387,7 @@ Abra o arquivo `electron/ipc/db.js` e adicione um novo objeto ao array `SEEDS`:
 
 ```js
 {
-  id: 'Id_Unico_Do_Template',        // Identificador único (sem espaços, sem acentos)
+  id: 'Id_Unico_Do_Modelo',        // Identificador único (sem espaços, sem acentos)
   nome: 'Nome Exibido na Interface',
   categoria: 'Requerimento',         // ou 'Certidão', ou qualquer categoria nova
   arquivo: 'nome_do_documento.docx', // deve bater exatamente com o nome do arquivo em seeds/
@@ -400,11 +400,11 @@ Abra o arquivo `electron/ipc/db.js` e adicione um novo objeto ao array `SEEDS`:
 },
 ```
 
-> **Regra importante:** o `id` de cada campo deve ser idêntico ao placeholder usado no .docx (ex: campo com `id: 'NOME'` substitui `{{NOME}}` no template).
+> **Regra importante:** o `id` de cada campo deve ser idêntico ao placeholder usado no .docx (ex: campo com `id: 'NOME'` substitui `{{NOME}}` no modelo).
 
 ### Passo 4 — Verificar o comportamento de sync
 
-O Docsign **sobrescreve** os arquivos .docx dos seeds a cada inicialização, copiando de `seeds/` para `userData/templates/`. Isso garante que correções no template cheguem automaticamente com updates.
+O Docsign **sobrescreve** os arquivos .docx dos seeds a cada inicialização, copiando de `seeds/` para `userData/templates/`. Isso garante que correções no modelo cheguem automaticamente com updates.
 
 Se o seed já existe no banco (`id` já registrado), os metadados (`nome`, `categoria`, `arquivo`, `campos`) são atualizados via `UPDATE`. O histórico de documentos gerados **não é afetado**.
 
@@ -414,7 +414,7 @@ Se o seed já existe no banco (`id` já registrado), os metadados (`nome`, `cate
 npm run dev
 ```
 
-O novo template deve aparecer no Painel após a inicialização. Se não aparecer, verifique:
+O novo modelo deve aparecer no Painel após a inicialização. Se não aparecer, verifique:
 - O `id` no array `SEEDS` é único e não conflita com outro seed
 - O nome do arquivo em `arquivo:` bate exatamente com o arquivo em `electron/assets/seeds/`
 - Os `id` dos campos correspondem aos placeholders `{{...}}` no .docx
@@ -431,13 +431,13 @@ npm run build
 
 ## 10. Guia de Uso
 
-### 9.1 Criar um novo template
+### 9.1 Criar um novo modelo
 
 1. Crie um arquivo `.docx` com os placeholders no formato `{{NOME_DO_CAMPO}}` (ex: `{{NOME}}`, `{{DATA_HOJE}}`)
-2. Acesse **Gerenciar templates → Importar**
+2. Acesse **Gerenciar modelos → Importar**
 3. Selecione o arquivo `.docx`
 4. Defina o nome, categoria e os campos do formulário (um para cada placeholder)
-5. Salve — o template aparecerá no Painel
+5. Salve — o modelo aparecerá no Painel
 
 ### 9.2 Gerar um documento individual
 
@@ -449,7 +449,7 @@ npm run build
 ### 9.3 Gerar documentos em lote
 
 1. Acesse **Geração em massa**
-2. Selecione o template
+2. Selecione o modelo
 3. Clique em **Ver modelo** para obter o JSON de exemplo com os campos corretos
 4. Cole o JSON preenchido com todos os registros (ou importe um arquivo `.json`)
 5. Clique em **Gerar todos**
@@ -457,7 +457,7 @@ npm run build
 
 ### 9.4 Formato do JSON para geração em massa
 
-O JSON deve ser um array de objetos. Cada chave deve corresponder ao `id` de um campo do template:
+O JSON deve ser um array de objetos. Cada chave deve corresponder ao `id` de um campo do modelo:
 
 ```json
 [
@@ -570,11 +570,11 @@ Armazenadas em `%APPDATA%\RHdoc\settings.json`:
 | Chave | Tipo | Padrão | Descrição |
 |---|---|---|---|
 | `pastaGerados` | string | `userData/gerados/` | Pasta onde os documentos gerados são salvos |
-| `assinatura` | string | `""` | Nome de assinatura injetado automaticamente em templates compatíveis |
+| `assinatura` | string | `""` | Nome de assinatura injetado automaticamente em modelos compatíveis |
 
 ---
 
-## 15. Templates Pré-carregados (Seeds)
+## 15. Modelos Pré-carregados (Seeds)
 
 O sistema instala automaticamente os seguintes documentos na primeira execução (e sincroniza em updates):
 
@@ -589,7 +589,7 @@ O sistema instala automaticamente os seguintes documentos na primeira execução
 
 Os arquivos `.docx` dos seeds estão em `electron/assets/seeds/` (dev) ou `resources/seeds/` (produção).
 
-> **Comportamento de sync:** a cada inicialização, os templates de seed são sobrescritos a partir dos arquivos empacotados. Isso garante que correções nos templates cheguem automaticamente com os updates da aplicação.
+> **Comportamento de sync:** a cada inicialização, os modelos de seed são sobrescritos a partir dos arquivos empacotados. Isso garante que correções nos modelos cheguem automaticamente com os updates da aplicação.
 
 ---
 

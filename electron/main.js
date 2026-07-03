@@ -103,6 +103,7 @@ app.whenReady().then(async () => {
     require('./ipc/templates')
     require('./ipc/documentos')
     require('./ipc/configuracoes')
+    require('./ipc/usuarios')
   } catch (err) {
     console.error('Erro na inicialização:', err)
     // Abre a janela mesmo assim; o erro aparecerá via dialog após a janela abrir

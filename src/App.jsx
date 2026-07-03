@@ -6,6 +6,7 @@ import Historico from './pages/Historico'
 import Configuracoes from './pages/Configuracoes'
 import Toast from './components/Toast'
 import Icon from './components/Icon'
+import TelaLogin from './components/TelaLogin'
 
 export default function App() {
   const [pagina, setPagina] = useState('painel')
@@ -16,6 +17,19 @@ export default function App() {
   const [updateAvailable, setUpdateAvailable] = useState(null)   // { version }
   const [updateReady, setUpdateReady] = useState(null)           // { version }
   const [updateProgress, setUpdateProgress] = useState(null)     // 0-100 ou null
+
+  const [precisaLogin, setPrecisaLogin] = useState(null) // null = verificando | true | false
+  const [autenticado, setAutenticado] = useState(false)
+
+  useEffect(() => {
+    if (!window.rh) {
+      setPrecisaLogin(false)
+      return
+    }
+    window.rh.temLoginCadastrado()
+      .then(setPrecisaLogin)
+      .catch(() => setPrecisaLogin(false))
+  }, [])
 
   useEffect(() => {
     if (window.rh) {
@@ -67,6 +81,14 @@ export default function App() {
   ]
 
   const paginaAtiva = pagina === 'formulario' ? 'formulario' : pagina
+
+  if (precisaLogin === null) {
+    return <div style={{ height: '100vh', background: 'var(--sidebar-bg)' }} />
+  }
+
+  if (precisaLogin && !autenticado) {
+    return <TelaLogin onSuccess={() => setAutenticado(true)} />
+  }
 
   return (
     <div className="app">

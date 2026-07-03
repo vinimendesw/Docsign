@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "docxtemplater": "^3.49.0",
     "electron-updater": "^6.8.3",
     "pizzip": "^3.1.7",
