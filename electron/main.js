@@ -91,45 +91,62 @@ function ensureDirectories() {
   })
 }
 
-app.whenReady().then(async () => {
-  // Remove o menu nativo (barra de menus) em todas as plataformas
-  Menu.setApplicationMenu(null)
+// Garante uma única instância rodando por vez. O banco (sql.js) é carregado
+// inteiro em memória e salvo por sobrescrita completa do arquivo — duas
+// instâncias concorrentes fariam a última a salvar apagar silenciosamente
+// as mudanças da outra (ex: um login cadastrado "sumindo").
+const gotSingleInstanceLock = app.requestSingleInstanceLock()
 
-  ensureDirectories()
-
-  try {
-    const { initDb } = require('./ipc/db')
-    await initDb()
-    require('./ipc/templates')
-    require('./ipc/documentos')
-    require('./ipc/configuracoes')
-    require('./ipc/usuarios')
-  } catch (err) {
-    console.error('Erro na inicialização:', err)
-    // Abre a janela mesmo assim; o erro aparecerá via dialog após a janela abrir
-    app.once('browser-window-created', () => {
-      dialog.showErrorBox(
-        'Erro ao inicializar o sistema',
-        `Não foi possível carregar o banco de dados.\n\n${err?.message ?? err}\n\n` +
-        'Verifique se o aplicativo foi instalado corretamente e tente novamente.'
-      )
-    })
-  }
-
-  // createWindow é chamado SEMPRE — nunca deixa a tela em branco sem motivo
-  createWindow()
-
-  // Configura auto-update (apenas em produção)
-  setupAutoUpdater()
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+if (!gotSingleInstanceLock) {
+  app.quit()
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
   })
-})
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+  app.whenReady().then(async () => {
+    // Remove o menu nativo (barra de menus) em todas as plataformas
+    Menu.setApplicationMenu(null)
+
+    ensureDirectories()
+
+    try {
+      const { initDb } = require('./ipc/db')
+      await initDb()
+      require('./ipc/templates')
+      require('./ipc/documentos')
+      require('./ipc/configuracoes')
+      require('./ipc/usuarios')
+    } catch (err) {
+      console.error('Erro na inicialização:', err)
+      // Abre a janela mesmo assim; o erro aparecerá via dialog após a janela abrir
+      app.once('browser-window-created', () => {
+        dialog.showErrorBox(
+          'Erro ao inicializar o sistema',
+          `Não foi possível carregar o banco de dados.\n\n${err?.message ?? err}\n\n` +
+          'Verifique se o aplicativo foi instalado corretamente e tente novamente.'
+        )
+      })
+    }
+
+    // createWindow é chamado SEMPRE — nunca deixa a tela em branco sem motivo
+    createWindow()
+
+    // Configura auto-update (apenas em produção)
+    setupAutoUpdater()
+
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    })
+  })
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit()
+  })
+}
 
 // ── AUTO-UPDATE ──────────────────────────────────────────────────────────────
 function setupAutoUpdater() {

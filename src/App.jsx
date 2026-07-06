@@ -95,16 +95,17 @@ export default function App() {
       {/* ── SIDEBAR ── */}
       <nav className={`sidebar${sidebarAberta ? '' : ' collapsed'}`}>
         <div className="sidebar-logo">
-          <div className="logo-mark">
+          <button
+            className="logo-mark"
+            onClick={() => setSidebarAberta(a => !a)}
+            title={sidebarAberta ? 'Recolher menu' : 'Expandir menu'}
+          >
             <Icon name="document-text" size={16} color="#141412" />
-          </div>
+          </button>
           <div className="logo-text">
             Docsign
             <small>Documentos</small>
           </div>
-          <button className="sidebar-toggle" onClick={() => setSidebarAberta(a => !a)} title={sidebarAberta ? 'Recolher menu' : 'Expandir menu'}>
-            {sidebarAberta ? <Icon name="chevron-left" size={13} /> : <Icon name="chevron-right" size={13} />}
-          </button>
         </div>
 
         <div className="sidebar-section">
